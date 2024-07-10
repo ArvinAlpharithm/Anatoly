@@ -15,7 +15,7 @@ if 'history' not in st.session_state:
 # Hardcoded OpenAI API key
 api_key = "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"
 
-# get user inputs
+# Get user inputs
 img_input = st.file_uploader('**Image**', accept_multiple_files=True, key=st.session_state['counters'][1])
 text_input = st.text_input('**Explain the Anomaly:**', '', key=st.session_state['counters'][0])
 
@@ -23,7 +23,7 @@ text_input = st.text_input('**Explain the Anomaly:**', '', key=st.session_state[
 def encode_image(image):
     return base64.b64encode(image.read()).decode('utf-8')
 
-# send api request
+# Send API request
 if st.button('Send'):
     if not api_key:
         st.warning('API Key required')
@@ -77,7 +77,7 @@ if st.button('Send'):
     else:
         st.error(f"Error: {response.status_code} - {response.text}")
 
-# display the assistant's response
+# Display the assistant's response
 if st.session_state['history']:
     last_response = st.session_state['history'][-1]
     if last_response['role'] == 'assistant':
