@@ -13,7 +13,7 @@ if 'history' not in st.session_state:
     st.session_state['counters'] = [0, 1]
 
 # Hardcoded OpenAI API key
-api_key = "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"
+api_key = "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"
 
 # Get user inputs
 img_input = st.file_uploader('**Image**', accept_multiple_files=True, key=st.session_state['counters'][1])
