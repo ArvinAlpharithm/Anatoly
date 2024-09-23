@@ -1,19 +1,24 @@
 import streamlit as st
 import requests
 from io import BytesIO
-from PIL import Image
 import base64
 import os
+from dotenv import load_dotenv
 
-st.set_page_config(page_title='GPT-4 Vision', page_icon='👁️')
+# Load environment variables from .env file
+load_dotenv()
 
+# Set up page configuration
+st.set_page_config(page_title='Groq Vision', page_icon='👁️')
+
+# Initialize session state
 if 'history' not in st.session_state:
     st.session_state['history'] = []
     st.session_state['cost'] = 0.0
     st.session_state['counters'] = [0, 1]
 
-# Hardcoded OpenAI API key
-api_key = "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"
+# Fetch Groq API key from environment variables
+api_key = os.getenv("GROQ_API_KEY")
 
 # Get user inputs
 img_input = st.file_uploader('**Image**', accept_multiple_files=True, key=st.session_state['counters'][1])
@@ -52,28 +57,29 @@ if st.button('Send'):
     
     st.session_state['history'].append({'role': 'user', 'content': msg_content})
     history = st.session_state['history'] if st.session_state['history'] else st.session_state['history'][1:]
-    
+
+    # Set headers for Groq API
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
     }
     
+    # Construct payload for Groq
     payload = {
-        "model": "gpt-4o",
+        "model": "llama3-70b-8192",  # Use the appropriate model for Groq
         "messages": history,
         "max_tokens": 300
     }
     
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    # Send request to Groq API
+    response = requests.post("https://api.groq.com/v1/chat/completions", headers=headers, json=payload)
     
     if response.status_code == 200:
         response_data = response.json()
         st.session_state['history'].append(
             {'role': 'assistant', 'content': response_data['choices'][0]['message']['content']}
         )
-        st.session_state['cost'] += response_data['usage']['prompt_tokens'] * 0.01 / 1000
-        st.session_state['cost'] += response_data['usage']['completion_tokens'] * 0.03 / 1000
-        st.session_state['counters'] = [i+2 for i in st.session_state['counters']]
+        # Assume cost calculation is not needed for Groq, adjust if required
     else:
         st.error(f"Error: {response.status_code} - {response.text}")
 
